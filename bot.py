@@ -8,7 +8,7 @@ import os
 # ------------------------------
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)  # Apenas uma instância do bot
 
 DATA_FILE = 'players.json'
 
@@ -180,9 +180,10 @@ async def remover(ctx, name: str):
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("❌ Apenas **administradores** podem usar esse comando.")
+    elif isinstance(error, commands.CommandNotFound):
+        await ctx.send("❌ Comando não encontrado.")
     else:
-        # Mostra erro no console caso seja outro tipo
-        print(error)
+        print(error)  # mostra outros erros no console
 
 # ------------------------------
 # Rodar o bot
