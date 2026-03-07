@@ -176,4 +176,5 @@ from discord.ext import commands
 bot = commands.Bot(command_prefix="!")
 
 # Pega o token da variável de ambiente
-bot.run(os.getenv("DISCORD_TOKEN"))
+bot.run(os.getenv("MTQ3OTg2OTkzNjkzNDQ1NzU2NQ.GA-BBq.LlhSAAVJQD8K2PMIm75uvc3Ge48Z8mj6WbGwzA"))
+
