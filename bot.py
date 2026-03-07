@@ -205,3 +205,4 @@ threading.Thread(target=run_flask).start()
 # Rodar o bot
 # ------------------------------
 bot.run(os.getenv("DISCORD_TOKEN"))
+
