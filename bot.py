@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import json
 import os
+from flask import Flask
+import threading
 
 # ------------------------------
 # Configurações iniciais
@@ -118,7 +120,6 @@ async def players(ctx):
         await ctx.send("❌ Nenhum player registrado ainda.")
         return
 
-    # Lista os players com nome + rank + bounty
     text = ""
     for name, data in players_data.items():
         text += f"🧑 {name} — 🏆 {data['rank']} — 💰 {data['bounty']}\n"
@@ -142,7 +143,6 @@ async def top(ctx):
         await ctx.send("❌ Nenhum player registrado.")
         return
 
-    # Ordena do maior para o menor bounty
     ranking = sorted(players.items(), key=lambda x: x[1].get('bounty', 0), reverse=True)
 
     embed = discord.Embed(
@@ -183,7 +183,23 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.CommandNotFound):
         await ctx.send("❌ Comando não encontrado.")
     else:
-        print(error)  # mostra outros erros no console
+        print(error)
+
+# ------------------------------
+# Servidor HTTP mínimo para Render (opcional)
+# ------------------------------
+app = Flask("")
+
+@app.route("/")
+def home():
+    return "Bot Khonsu está online!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+# Rodar Flask em thread separada
+threading.Thread(target=run_flask).start()
 
 # ------------------------------
 # Rodar o bot
