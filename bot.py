@@ -170,5 +170,10 @@ async def on_command_error(ctx, error):
 # ------------------------------
 # Rodar o bot
 # ------------------------------
-TOKEN = "MTQ3OTg2OTkzNjkzNDQ1NzU2NQ.G0ZgDW.DBjxlBhraNnUgg_j1ySAiydceE5IgDCWbLqfLU"
-bot.run(TOKEN)
+import os
+from discord.ext import commands
+
+bot = commands.Bot(command_prefix="!")
+
+# Pega o token do ambiente
+bot.run(os.getenv("MTQ3OTg2OTkzNjkzNDQ1NzU2NQ.Gsrmnb.PmRPfZow7RGlAONdLP2UTYi0MW63LcHGzNtm8o"))
