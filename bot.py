@@ -3,7 +3,9 @@ from discord.ext import commands
 import json
 import os
 
+# ------------------------------
 # Configurações iniciais
+# ------------------------------
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -17,7 +19,10 @@ def load_players():
     if not os.path.exists(DATA_FILE):
         return {}
     with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return {}
 
 def save_players(players):
     with open(DATA_FILE, 'w') as f:
@@ -29,9 +34,7 @@ def save_players(players):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setrank(ctx, name: str, rank: str):
-
     players = load_players()
-
     valid_ranks = ['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal','Radiant','SS']
 
     if rank not in valid_ranks:
@@ -49,7 +52,6 @@ async def setrank(ctx, name: str, rank: str):
         title="✨ Player Registrado!",
         color=0x8A2BE2
     )
-
     embed.add_field(name="🧑 Nome", value=name, inline=False)
     embed.add_field(name="🏆 Rank", value=rank, inline=False)
     embed.add_field(name="💰 Bounty", value=players[name]['bounty'], inline=False)
@@ -62,7 +64,6 @@ async def setrank(ctx, name: str, rank: str):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def bounty(ctx, name: str, value: int):
-
     players = load_players()
 
     if name not in players:
@@ -79,7 +80,6 @@ async def bounty(ctx, name: str, value: int):
         title="💰 Bounty Atualizada!",
         color=0x8A2BE2
     )
-
     embed.add_field(name="🧑 Nome", value=name, inline=False)
     embed.add_field(name="🏆 Rank", value=players[name]['rank'], inline=False)
     embed.add_field(name="💵 Nova Bounty", value=value, inline=False)
@@ -91,7 +91,6 @@ async def bounty(ctx, name: str, value: int):
 # ------------------------------
 @bot.command()
 async def profile(ctx, name: str):
-
     players = load_players()
 
     if name not in players:
@@ -102,7 +101,6 @@ async def profile(ctx, name: str):
         title="📜 Perfil do Player",
         color=0x8A2BE2
     )
-
     embed.add_field(name="🧑 Nome", value=name, inline=False)
     embed.add_field(name="🏆 Rank", value=players[name]['rank'], inline=False)
     embed.add_field(name="💰 Bounty", value=players[name]['bounty'], inline=False)
@@ -110,33 +108,53 @@ async def profile(ctx, name: str):
     await ctx.send(embed=embed)
 
 # ------------------------------
-# Comando !top (ranking)
+# Comando !players (TODOS)
 # ------------------------------
 @bot.command()
-async def top(ctx):
+async def players(ctx):
+    players_data = load_players()
 
-    players = load_players()
-
-    if not players:
-        await ctx.send("Nenhum player registrado.")
+    if not players_data:
+        await ctx.send("❌ Nenhum player registrado ainda.")
         return
 
-    ranking = sorted(players.items(), key=lambda x: x[1]['bounty'], reverse=True)
+    # Lista os players com nome + rank + bounty
+    text = ""
+    for name, data in players_data.items():
+        text += f"🧑 {name} — 🏆 {data['rank']} — 💰 {data['bounty']}\n"
 
     embed = discord.Embed(
-        title="🏆 Ranking de Bounty",
+        title="📋 Lista de Players",
+        description=text,
         color=0x8A2BE2
     )
 
-    pos = 1
-    text = ""
+    await ctx.send(embed=embed)
 
-    for name, data in ranking[:10]:
-        text += f"**{pos}. {name}** — 💰 {data['bounty']}\n"
-        pos += 1
+# ------------------------------
+# Comando !top (TODOS)
+# ------------------------------
+@bot.command()
+async def top(ctx):
+    players = load_players()
+
+    if not players:
+        await ctx.send("❌ Nenhum player registrado.")
+        return
+
+    # Ordena do maior para o menor bounty
+    ranking = sorted(players.items(), key=lambda x: x[1].get('bounty', 0), reverse=True)
+
+    embed = discord.Embed(
+        title="🏆 Top 10 Players por Bounty",
+        color=0x8A2BE2
+    )
+
+    text = ""
+    for pos, (name, data) in enumerate(ranking[:10], start=1):
+        text += f"**{pos}. {name}** — 🏆 {data['rank']} — 💰 {data.get('bounty', 0)}\n"
 
     embed.description = text
-
     await ctx.send(embed=embed)
 
 # ------------------------------
@@ -145,7 +163,6 @@ async def top(ctx):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def remover(ctx, name: str):
-
     players = load_players()
 
     if name not in players:
@@ -153,9 +170,7 @@ async def remover(ctx, name: str):
         return
 
     del players[name]
-
     save_players(players)
-
     await ctx.send(f"🗑️ Player **{name}** removido.")
 
 # ------------------------------
@@ -163,24 +178,13 @@ async def remover(ctx, name: str):
 # ------------------------------
 @bot.event
 async def on_command_error(ctx, error):
-
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("❌ Apenas **administradores** podem usar esse comando.")
+    else:
+        # Mostra erro no console caso seja outro tipo
+        print(error)
 
 # ------------------------------
 # Rodar o bot
 # ------------------------------
-import os
-from discord.ext import commands
-import discord
-
-# Configura os intents que seu bot precisa
-intents = discord.Intents.default()
-intents.message_content = True  # permite ler o conteúdo das mensagens
-
-bot = commands.Bot(command_prefix="!", intents=intents)
-
-# Pega o token da variável de ambiente
 bot.run(os.getenv("DISCORD_TOKEN"))
-
-
