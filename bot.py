@@ -172,8 +172,13 @@ async def on_command_error(ctx, error):
 # ------------------------------
 import os
 from discord.ext import commands
+import discord
 
-bot = commands.Bot(command_prefix="!")
+# Configura os intents que seu bot precisa
+intents = discord.Intents.default()
+intents.message_content = True  # permite ler o conteúdo das mensagens
+
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Pega o token da variável de ambiente
 bot.run(os.getenv("DISCORD_TOKEN"))
