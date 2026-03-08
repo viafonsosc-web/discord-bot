@@ -37,7 +37,7 @@ def save_players(players):
 @commands.has_permissions(administrator=True)
 async def setrank(ctx, name: str, rank: str):
     players = load_players()
-    valid_ranks = ['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal','Radiant','SS']
+    valid_ranks = ['Iron','Bronze','Silver','Gold','Platinum','Diamond','Ascendant','Immortal','Radiant','SS','S','A','B','C']
 
     if rank not in valid_ranks:
         await ctx.send("❌ Rank inválido!")
@@ -285,5 +285,6 @@ threading.Thread(target=run_flask).start()
 # Rodar o bot
 # ------------------------------
 bot.run(os.getenv("DISCORD_TOKEN"))
+
 
 
