@@ -131,7 +131,7 @@ async def setinfo(ctx, name: str, rank: str, bounty: int, cla: str, respiracao: 
     embed.add_field(name="🏆 Rank", value=rank, inline=False)
     embed.add_field(name="💰 Bounty", value=bounty, inline=False)
     embed.add_field(name="⚔️ Cla Principal", value=cla, inline=False)
-    embed.add_field(name="💨 Respiração Principal", value=respiracao, inline=False)
+    embed.add_field(name="💨 Respiração atual", value=respiracao, inline=False)
     embed.add_field(name="🗡️ Espada", value=espada, inline=False)
     embed.add_field(name="🧬 Raça", value=raca, inline=False)
     embed.add_field(name="🎮 Estilo de Jogo", value=estilo, inline=False)
@@ -285,3 +285,4 @@ threading.Thread(target=run_flask).start()
 # Rodar o bot
 # ------------------------------
 bot.run(os.getenv("DISCORD_TOKEN"))
+
